@@ -1,0 +1,22 @@
+# PostgreSQL local pour la démonstration.
+# vLLM n'est pas lancé ici : le modèle se sert à part, avec une API compatible OpenAI.
+services:
+  postgres:
+    image: postgres:16
+    container_name: olist-postgres
+    environment:
+      POSTGRES_USER: olist
+      POSTGRES_PASSWORD: olist
+      POSTGRES_DB: olist
+    ports:
+      - "5432:5432"
+    volumes:
+      - olist_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U olist -d olist"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  olist_pg:

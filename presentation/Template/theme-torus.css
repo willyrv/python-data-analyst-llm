@@ -1,0 +1,79 @@
+/* @theme torus */
+
+@import 'default';
+
+section {
+  background-color: #03266E;
+  color: #ffffff;
+  background-image:
+    url('assets/hex-network.svg'),
+    url('assets/torus-icon-white.svg');
+  background-repeat: no-repeat, no-repeat;
+  background-position: right -40px center, right 28px top 22px;
+  background-size: 46% auto, 48px auto;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  justify-content: start;
+  padding: 52px 56px 48px 56px;
+}
+
+section.lead {
+  background-image:
+    url('assets/hex-network.svg'),
+    url('assets/logo-torus-or.svg');
+  background-position: right -20px bottom -40px, 50% 11%;
+  background-size: 58% auto, 168px auto;
+  justify-content: center;
+  text-align: center;
+}
+
+section h1,
+section a,
+section footer,
+section::after {
+  color: #ffffff;
+}
+
+section.invert {
+  background-color: #03266E;
+  color: #ffffff;
+}
+
+section.lead.invert {
+  background-image:
+    url('assets/hex-network.svg'),
+    url('assets/logo-torus-or.svg');
+  background-size: 58% auto, 168px auto;
+}
+
+section.invert h1,
+section.invert footer,
+section.invert::after {
+  color: #ffffff;
+}
+
+section.invert a {
+  color: #d4af34;
+}
+
+section::after {
+  content: attr(data-marpit-pagination) ' / ' attr(data-marpit-pagination-total);
+  color: #70a5df;
+  font-size: 13px;
+}
+
+section.light {
+  background-color: #ffffff;
+  color: #03266e;
+  background-image:
+    url('assets/hex-network.svg'),
+    url('assets/torus-icon-gold.svg');
+  background-position: right -80px center, right 28px top 22px;
+  background-size: 40% auto, 48px auto;
+}
+
+section.light h1,
+section.light h2,
+section.light footer,
+section.light::after {
+  color: #03266e;
+}

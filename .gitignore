@@ -1,0 +1,29 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+outputs/
+*.egg-info/
+.streamlit/secrets.toml
+.DS_Store
+
+# Jeton Kaggle et clés LLM : uniquement sur la machine, jamais dans git
+.secrets/
+api-keys.txt
+kaggle_API_token.txt
+kaggle.json
+access_token
+
+# CSV Olist téléchargés
+data/olist/
+
+# Photos et visuels d'une autre présentation, inutiles pour cette démo
+presentation/Template/People/
+presentation/Template/assets/people/
+presentation/Template/assets/web/
+presentation/Template/assets/partners/
+presentation/Template/proposition_presentation_partenariat_Torus_GIPSE.html

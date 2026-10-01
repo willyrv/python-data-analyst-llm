@@ -1,0 +1,26 @@
+[
+  {
+    "id": "q0",
+    "question": "Combien de commandes contient la table orders ?",
+    "expected_facts": [],
+    "expected_tool": "query_database"
+  },
+  {
+    "id": "q1",
+    "question": "Quelles sont les cinq catégories de produits ayant généré le plus de chiffre d'affaires ?",
+    "expected_facts": [],
+    "expected_tool": "query_database"
+  },
+  {
+    "id": "q2",
+    "question": "Le retard de livraison a-t-il un impact mesurable sur la satisfaction des clients ? Montre-moi les données et génère un graphique.",
+    "expected_facts": [],
+    "expected_tool": "create_chart"
+  },
+  {
+    "id": "q3",
+    "question": "Quelles sont les principales raisons d'insatisfaction des clients dont la commande est arrivée en retard ? Appuie ta réponse sur les avis clients.",
+    "expected_facts": [],
+    "expected_tool": "search_reviews"
+  }
+]

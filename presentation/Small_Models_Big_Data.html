@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Small Models, Big Data — Mêlée Tech 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #D4AF34;
+      --dark: #03266E;
+      --blue: #11365F;
+      --light: #70A5DF;
+      --grey: #DAE0E8;
+      --white: #FFFFFF;
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: #020b22;
+      color: var(--white);
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+    }
+    .stage {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+    .frame {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      position: relative;
+      transform-origin: center center;
+      box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      background: linear-gradient(115deg, #03266E 0%, #03266E 48%, #11365F 100%);
+      padding: 48px 56px 72px;
+      overflow: hidden;
+    }
+    .slide::before {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: 0;
+      width: 48%;
+      height: 100%;
+      background: url("Template/assets/hex-network.svg") right center / contain no-repeat;
+      opacity: .85;
+      pointer-events: none;
+    }
+    .slide.active { display: flex; flex-direction: column; height: 100%; }
+    .slide.cover.active, .slide.closing.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+    .slide.cover, .slide.closing { justify-content: center; text-align: center; padding: 0; }
+    .slide.cover::before, .slide.closing::before { width: 58%; right: -80px; opacity: 1; }
+    .mark {
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: .18em;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .mark img { width: 42px; height: 42px; }
+    .kicker {
+      color: var(--gold);
+      font-style: italic;
+      font-size: 18px;
+      line-height: 1.4;
+      margin: 4px 0 14px;
+      max-width: 980px;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+    h1, h2 { font-weight: 700; position: relative; z-index: 1; flex-shrink: 0; }
+    h2 { font-size: 34px; line-height: 1.15; margin-bottom: 4px; max-width: 1000px; }
+    p, li { position: relative; z-index: 1; }
+    .content {
+      position: relative;
+      z-index: 1;
+      flex: 1 1 0%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
+    }
+    .footer {
+      position: absolute;
+      left: 56px;
+      right: 110px;
+      bottom: 18px;
+      font-size: 13px;
+      color: var(--light);
+      z-index: 6;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .page { font-variant-numeric: tabular-nums; }
+    .cols { display: grid; gap: 14px; }
+    .cols-2 { grid-template-columns: 1fr 1fr; }
+    .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .card {
+      background: rgba(17,54,95,.55);
+      border: 1px solid rgba(212,175,52,.38);
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    .card h3 { color: var(--gold); font-size: 18px; margin-bottom: 8px; }
+    .card.gold { background: rgba(212,175,52,.12); }
+    .card.tall {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+    ul, ol { padding-left: 1.15em; }
+    li + li { margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 17px; }
+    th {
+      background: rgba(212,175,52,.18);
+      text-align: left;
+      padding: 12px 14px;
+      font-weight: 600;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      vertical-align: middle;
+    }
+    .band {
+      padding: 14px 18px;
+      background: rgba(2,11,34,.35);
+      border-left: 4px solid var(--gold);
+      border-radius: 0 12px 12px 0;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+    .sql {
+      font-size: 15px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      color: var(--grey);
+    }
+    .roadmap { display: flex; gap: 12px; align-items: stretch; }
+    .roadmap .step {
+      flex: 1;
+      background: rgba(255,255,255,.07);
+      border-top: 3px solid var(--gold);
+      border-radius: 0 0 12px 12px;
+      padding: 22px 16px;
+      font-size: 18px;
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .roadmap .n {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .badge {
+      display: inline-block;
+      border: 1px solid rgba(212,175,52,.65);
+      color: var(--gold);
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin: 0 8px;
+      font-size: 16px;
+    }
+    .cover-logo { width: 132px; height: 132px; margin: 0 auto 18px; position: relative; z-index: 2; }
+    .cover-logo.tds, .mark img.tds {
+      border-radius: 50%;
+      background: #fff;
+      object-fit: cover;
+    }
+    .cover-logo.tds { width: 112px; height: 112px; }
+    .code {
+      font-size: 15px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      background: rgba(2,11,34,.45);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--grey);
+    }
+    td code, .card code { color: var(--gold); font-size: 0.95em; }
+    .quotes { display: flex; flex-direction: column; gap: 6px; }
+    .quotes p { color: var(--gold); font-style: italic; font-size: 20px; line-height: 1.35; }
+    .cycle {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      counter-reset: step;
+    }
+    .cycle li {
+      background: rgba(255,255,255,.07);
+      border-top: 3px solid var(--gold);
+      border-radius: 0 0 12px 12px;
+      padding: 16px 16px 14px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .cycle li::before {
+      counter-increment: step;
+      content: counter(step) ". ";
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .flow { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+    .flow-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+    .flow-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+    .branch { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .node {
+      background: rgba(17,54,95,.55);
+      border: 1px solid rgba(212,175,52,.45);
+      border-radius: 12px;
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.3;
+    }
+    .node.accent { border-color: var(--gold); }
+    .arrow { color: var(--gold); font-weight: 700; font-size: 22px; line-height: 1; }
+    .arch { gap: 0; width: 100%; }
+    .arch .node { min-width: 168px; }
+    .vlink {
+      width: 2px;
+      background: var(--gold);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .vlink.into {
+      height: 26px;
+      margin-bottom: 8px;
+    }
+    .vlink.into::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -8px;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--gold);
+    }
+    .vlink.join { height: 16px; }
+    .fork {
+      width: min(980px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+    }
+    .fork::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 25%;
+      width: 50%;
+      height: 2px;
+      background: var(--gold);
+    }
+    ol.demo { font-size: 22px; line-height: 1.45; padding-left: 1.3em; }
+    ol.demo li + li { margin-top: 14px; }
+    .title-band {
+      background: rgba(2, 8, 28, .72);
+      padding: 26px 72px;
+      position: relative;
+      z-index: 2;
+    }
+    .title-band h1 { margin: 0 auto; font-size: 48px; line-height: 1.1; }
+    .title-band .sub { margin-top: 10px; font-size: 22px; font-style: italic; }
+    .cover-quote {
+      margin: 22px auto 0;
+      max-width: 920px;
+      color: var(--gold);
+      font-size: 22px;
+      font-style: italic;
+      line-height: 1.35;
+      position: relative;
+      z-index: 2;
+    }
+    .speaker {
+      margin-top: 22px;
+      position: relative;
+      z-index: 2;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+    .speaker strong { font-size: 22px; font-weight: 600; }
+    .speaker span { display: block; color: var(--light); font-size: 16px; }
+    .cover-date { margin-top: 16px; font-size: 16px; position: relative; z-index: 2; color: var(--light); }
+    .progress {
+      position: absolute;
+      left: 0; right: 0; bottom: 0; height: 3px;
+      background: rgba(255,255,255,.12);
+      z-index: 5;
+    }
+    .progress span { display: block; height: 100%; background: var(--gold); width: 0; }
+    .nav {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+    .nav button {
+      width: 44px; height: 44px;
+      border: 1px solid rgba(212,175,52,.5);
+      background: rgba(3,38,110,.85);
+      color: var(--white);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .nav button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .help {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      font-size: 12px;
+      color: rgba(255,255,255,.55);
+      z-index: 20;
+    }
+    body.exporting { background: #03266E; }
+    body.exporting .nav, body.exporting .help { display: none !important; }
+    body.exporting .stage { width: 1280px; height: 720px; }
+    body.exporting .frame { transform: none !important; box-shadow: none; }
+    @media print {
+      @page { size: 338.67mm 190.5mm; margin: 0; }
+      html, body { background: #03266E; overflow: visible !important; height: auto !important; width: 1280px !important; }
+      .nav, .help, .progress { display: none !important; }
+      .stage { display: block !important; width: 1280px; height: auto; }
+      .frame { transform: none !important; width: 1280px; height: auto; box-shadow: none; position: static; }
+      .slide {
+        display: flex !important;
+        flex-direction: column;
+        position: relative !important;
+        width: 1280px !important;
+        height: 720px !important;
+        overflow: hidden !important;
+        break-after: page;
+        page-break-after: always;
+      }
+      .slide.cover, .slide.closing { justify-content: center; text-align: center; }
+      .slide:last-of-type { break-after: auto; page-break-after: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="frame" id="frame">
+
+      <section class="slide cover active">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt="Toulouse Data Science"><span>TDS</span></div>
+        <img class="cover-logo tds" src="assets/tds-logo.png" alt="Toulouse Data Science">
+        <div class="title-band">
+          <h1>Small Models, Big Data</h1>
+          <p class="sub">Construire un Data Analyst avec un LLM auto-hébergé</p>
+        </div>
+        <p class="cover-quote">Cas d'étude : e-commerce, dataset Olist</p>
+        <p class="speaker">
+          <strong>Willy Rodriguez</strong>
+          <span>Président de Toulouse Data Science</span>
+          <span>Chercheur IA chez Torus Actions</span>
+        </p>
+        <p class="cover-date">Mêlée Tech 2026 · 20 minutes, puis 10 minutes de démonstration</p>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Explorer des données en langage naturel</h2>
+        <p class="kicker">Nous avons un dataset. Nous voulons l'interroger sans écrire chaque opération.</p>
+        <div class="content">
+          <div class="cols cols-2">
+            <article class="card tall">
+              <ul>
+                <li>Poser des questions sur son contenu.</li>
+                <li>Explorer les ventes et les livraisons.</li>
+                <li>Visualiser des tendances.</li>
+                <li>Poursuivre l'analyse avec des questions de suivi.</li>
+              </ul>
+            </article>
+            <div class="quotes">
+              <p>« Comment évoluent les ventes ? »</p>
+              <p>« Quelles catégories contribuent le plus ? »</p>
+              <p>« Les retards de livraison sont-ils associés à de moins bonnes notes ? »</p>
+            </div>
+          </div>
+          <div class="band">L'utilisateur formule sa demande. L'application exécute l'analyse.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>La stack technique</h2>
+        <p class="kicker">Deux API distinctes : celle de l'application et celle du serveur de modèle.</p>
+        <div class="content">
+          <table>
+            <thead><tr><th>Couche</th><th>Choix proposé</th><th>Fonction</th></tr></thead>
+            <tbody>
+              <tr><td>Interface</td><td>Streamlit</td><td>Conversation, tableaux et graphiques</td></tr>
+              <tr><td>API applicative</td><td>FastAPI</td><td>Sessions, demandes d'analyse et résultats</td></tr>
+              <tr><td>Orchestration</td><td>Python</td><td>Appels d'outils, contrôles et limites</td></tr>
+              <tr><td>Inférence</td><td>Ollama</td><td>Service d'accès au modèle local</td></tr>
+              <tr><td>Données</td><td>PostgreSQL</td><td>Tables Olist et vues analytiques</td></tr>
+              <tr><td>Analyse</td><td>pandas et Plotly</td><td>Traitements et graphiques</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>L'architecture de l'application</h2>
+        <div class="content">
+          <div class="flow arch">
+            <div class="flow-row">
+              <div class="node">Utilisateur</div>
+              <span class="arrow">→</span>
+              <div class="node">Streamlit</div>
+              <span class="arrow">→</span>
+              <div class="node accent">API FastAPI<br>et orchestrateur</div>
+              <span class="arrow">↔</span>
+              <div class="node">Ollama<br>et modèle local</div>
+            </div>
+            <div class="vlink into"></div>
+            <div class="node accent">Contrôle des appels d'outils</div>
+            <div class="vlink join"></div>
+            <div class="fork">
+              <div class="branch">
+                <div class="vlink into"></div>
+                <div class="node">SQL en lecture seule</div>
+                <div class="vlink into"></div>
+                <div class="node">PostgreSQL : données Olist</div>
+              </div>
+              <div class="branch">
+                <div class="vlink into"></div>
+                <div class="node">Calculs et graphiques Python</div>
+                <div class="vlink into"></div>
+                <div class="node">Résultats et artefacts</div>
+              </div>
+            </div>
+          </div>
+          <div class="band">Le backend garde le contrôle de l'exécution et conserve les résultats.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Matériel et taille du modèle</h2>
+        <p class="kicker">Configuration d'inférence prévue : NVIDIA RTX 4090, 24 Go de VRAM.</p>
+        <div class="content">
+          <table>
+            <thead><tr><th>Ressource</th><th>Utilisation principale</th></tr></thead>
+            <tbody>
+              <tr><td>Mémoire GPU</td><td>Paramètres du modèle, cache de contexte et exécution</td></tr>
+              <tr><td>CPU et RAM</td><td>Base de données, extractions et analyses Python</td></tr>
+              <tr><td>Stockage</td><td>Modèles, données et artefacts</td></tr>
+            </tbody>
+          </table>
+          <div class="band">Le dataset reste dans la base. Le modèle reçoit le contexte utile à la question.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Le dataset Olist</h2>
+        <p class="kicker">Brazilian E-Commerce Public Dataset by Olist. Environ 100&nbsp;000 commandes, 2016–2018.</p>
+        <div class="content">
+          <table>
+            <thead><tr><th>Famille de données</th><th>Utilisation dans le cas d'étude</th></tr></thead>
+            <tbody>
+              <tr><td>Commandes et articles</td><td>Volumes et montants de vente</td></tr>
+              <tr><td>Clients et vendeurs</td><td>Répartition géographique et activité</td></tr>
+              <tr><td>Produits et catégories</td><td>Comparaison des catégories</td></tr>
+              <tr><td>Paiements</td><td>Analyse des moyens de paiement</td></tr>
+              <tr><td>Dates de livraison et avis</td><td>Délais et satisfaction</td></tr>
+            </tbody>
+          </table>
+          <div class="band">Trois niveaux à distinguer : commande, article, client. Neuf fichiers CSV, données réelles anonymisées.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Les questions d'analyse</h2>
+        <div class="content">
+          <table>
+            <thead><tr><th>Niveau</th><th>Exemple de question</th></tr></thead>
+            <tbody>
+              <tr><td>Décrire</td><td>Comment évoluent les commandes et le montant des articles par mois ?</td></tr>
+              <tr><td>Comparer</td><td>Quelles catégories ont le montant de vente le plus élevé ?</td></tr>
+              <tr><td>Segmenter</td><td>Comment les délais de livraison varient-ils selon l'État du client ?</td></tr>
+              <tr><td>Approfondir</td><td>Les commandes en retard reçoivent-elles des notes différentes ?</td></tr>
+              <tr><td>Interpréter</td><td>Que pouvons-nous conclure, et que faut-il encore vérifier ?</td></tr>
+            </tbody>
+          </table>
+          <div class="band">Une question de suivi conserve le périmètre et précise l'analyse.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Le workflow agentique</h2>
+        <p class="kicker">Un cycle d'analyse guidé par les résultats des outils.</p>
+        <div class="content">
+          <ol class="cycle">
+            <li>Interpréter la question et ses contraintes.</li>
+            <li>Consulter le schéma utile.</li>
+            <li>Proposer un appel d'outil structuré.</li>
+            <li>Contrôler et exécuter cet appel.</li>
+            <li>Exploiter le résultat ou corriger une erreur.</li>
+            <li>Poursuivre l'analyse ou produire une réponse.</li>
+          </ol>
+          <div class="band">L'application fixe les outils disponibles et les conditions d'arrêt.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Contexte, contrôles et fiabilité</h2>
+        <div class="content">
+          <table>
+            <thead><tr><th>Besoin</th><th>Réponse proposée dans l'application</th></tr></thead>
+            <tbody>
+              <tr><td>Comprendre les données</td><td>Dictionnaire, clés de jointure et vues métier</td></tr>
+              <tr><td>Conserver les choix</td><td>État explicite : période, métrique et filtres</td></tr>
+              <tr><td>Limiter les opérations</td><td>Accès SQL restreint, outils autorisés et délais</td></tr>
+              <tr><td>Vérifier les résultats</td><td>Requête, effectifs, calculs et références visibles</td></tr>
+              <tr><td>Gérer les échecs</td><td>Reprises bornées et message d'erreur explicite</td></tr>
+            </tbody>
+          </table>
+          <div class="band">La qualité d'une analyse dépend aussi de ses définitions et de son périmètre.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide">
+        <div class="mark"><img class="tds" src="assets/tds-logo.png" alt=""><span>TDS</span></div>
+        <h2>Le parcours de démonstration</h2>
+        <p class="kicker">Trois questions sur Olist, sur la même période.</p>
+        <div class="content">
+          <ol class="demo">
+            <li>Comment évolue le montant des articles par mois ?</li>
+            <li>Quelles catégories représentent le plus de ventes ?</li>
+            <li>Les commandes en retard reçoivent-elles de moins bonnes notes ?</li>
+          </ol>
+          <div class="band">À observer : appels d'outils, tableaux, graphiques et limites.</div>
+        </div>
+        <div class="footer"><span>Mêlée Tech 2026 · Small Models, Big Data · Willy Rodriguez</span><span class="page"></span></div>
+      </section>
+
+      <section class="slide closing">
+        <div class="mark"><span>TORUS AI</span></div>
+        <img class="cover-logo" src="Template/assets/logo-torus-or.svg" alt="Torus AI">
+        <div class="title-band">
+          <h1>Merci à Torus AI</h1>
+          <p class="sub">Le langage naturel demande l'analyse. Le système montre les données, les calculs et les limites.</p>
+        </div>
+        <div class="content cols cols-3" style="width: min(1080px, 92%); margin: 22px auto 0; flex: 0 0 auto;">
+          <article class="card tall"><h3>Serveurs de calcul</h3><p>Prêtés pour préparer et servir les modèles de la démonstration.</p></article>
+          <article class="card tall"><h3>Temps-homme</h3><p>Échanges pour cadrer l'architecture et les choix techniques.</p></article>
+          <article class="card tall"><h3>Support</h3><p>Appui informatique et technique jusqu'à la séance.</p></article>
+        </div>
+        <p class="speaker">
+          <strong>Willy Rodriguez</strong>
+          <span>Président de Toulouse Data Science · Chercheur IA chez Torus Actions</span>
+        </p>
+        <p class="cover-date">www.torus.ai</p>
+      </section>
+
+      <div class="progress"><span id="bar"></span></div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button type="button" id="prev" aria-label="Slide précédente">‹</button>
+    <button type="button" id="next" aria-label="Slide suivante">›</button>
+  </div>
+  <p class="help">← → · Espace · F plein écran</p>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const bar = document.getElementById("bar");
+    const exporting = new URLSearchParams(location.search).has("export");
+    let i = 0;
+    function go(n) {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle("active", k === i));
+      bar.style.width = ((i + 1) / slides.length * 100) + "%";
+      document.querySelectorAll(".page").forEach(p => { p.textContent = (i + 1) + " / " + slides.length; });
+      if (location.hash !== "#" + (i + 1)) history.replaceState(null, "", "#" + (i + 1));
+    }
+    function scale() {
+      const frame = document.getElementById("frame");
+      if (exporting || document.body.classList.contains("printing")) {
+        frame.style.transform = "none";
+        return;
+      }
+      const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.96;
+      frame.style.transform = "scale(" + s + ")";
+    }
+    function preparePrint() {
+      document.body.classList.add("printing");
+      slides.forEach((s, k) => {
+        s.classList.add("active");
+        s.querySelectorAll(".page").forEach(p => { p.textContent = (k + 1) + " / " + slides.length; });
+      });
+      scale();
+    }
+    window.addEventListener("beforeprint", preparePrint);
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("printing");
+      go(i);
+      scale();
+    });
+    if (exporting) document.body.classList.add("exporting");
+    document.getElementById("prev").onclick = () => go(i - 1);
+    document.getElementById("next").onclick = () => go(i + 1);
+    document.addEventListener("keydown", e => {
+      if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); go(i + 1); }
+      if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(i - 1); }
+      if (e.key === "Home") go(0);
+      if (e.key === "End") go(slides.length - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+    });
+    window.addEventListener("resize", scale);
+    window.addEventListener("hashchange", () => {
+      const n = parseInt(location.hash.slice(1), 10);
+      if (n >= 1 && n <= slides.length) go(n - 1);
+    });
+    scale();
+    const start = parseInt(location.hash.slice(1), 10);
+    go(start >= 1 && start <= slides.length ? start - 1 : 0);
+  </script>
+</body>
+</html>
